@@ -17,7 +17,7 @@ client.on("messageCreate", async (message) => {
 
     if (!message?.author.bot) {
         console.log(message.content)
-        if (message.content == 'tree') {
+        if (message.content.toLowerCase.includes('tree')) {
             message.channel.send({ files: [{ attachment: 'tree.png' }] })
         }
     }
