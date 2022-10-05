@@ -1,7 +1,7 @@
-import dotenv from 'dotenv'
+const dotenv = require('dotenv');
 dotenv.config()
 
-import { Client, GatewayIntentBits } from 'discord.js';
+const { Client, GatewayIntentBits } = require('discord.js');
 
 const client = new Client({
     intents: [
@@ -10,6 +10,22 @@ const client = new Client({
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.MessageContent
     ]
+});
+
+client.once('ready', () => {
+    console.log('Ready!')
+})
+
+client.on('interactionCreate', async interaction => {
+	if (!interaction.isChatInputCommand()) return;
+
+	const { commandName } = interaction;
+
+	if (commandName === 'minecraft') {
+		await interaction.reply('129.151.81.83');
+	} else if (commandName === 'map') {
+		await interaction.reply('http://129.151.81.83:8123/');
+	}
 });
 
 client.on("messageCreate", async (message) => {
