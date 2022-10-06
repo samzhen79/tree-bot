@@ -29,6 +29,31 @@ const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('
 
 client.once('ready', () => {
     console.log('Ready!')
+    let targetGuild = client.guilds.cache.get('795738159265611817')
+    let sounds = ['https://www.youtube.com/watch?v=XpJEg6MTPzc&ab_channel=DucklasMacDuck',
+                'https://www.youtube.com/watch?v=YVTR8lTnnx8&list=PL6F112y8X_M5F7_DFgeIbSI5Tb9Cx7CA4&index=3&ab_channel=Dagre',
+                'https://www.youtube.com/watch?v=iqkQRgGdAPo&ab_channel=JeremySoule-Topic',
+                'https://www.youtube.com/watch?v=idu7_wLb69E&ab_channel=Poet']
+    let guildQueue = client.player.getQueue(targetGuild);
+    let timer = getRandomInt(1000000,100000000)
+    let counter = 0
+    setTimeout(async () => {
+        counter += 1
+        console.log("Attempted Invasions: " + counter)
+        let channel = targetGuild.channels.cache.filter(ch => ch.type === 2).random().id
+        let queue = client.player.createQueue(targetGuild);
+        await queue.join(channel);
+        let song = await queue.play(sounds[Math.floor(Math.random() * sounds.length)]).catch(err => {
+            console.log(err);
+        })
+        timer = getRandomInt(1000000,100000000)
+    }, timer)
+
+    function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+      }
 })
 
 for (const file of commandFiles) {
