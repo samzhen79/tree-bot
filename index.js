@@ -1,30 +1,58 @@
 const dotenv = require('dotenv');
 dotenv.config()
 
-const { Client, GatewayIntentBits } = require('discord.js');
+const fs = require('node:fs');
+const path = require('node:path');
+
+const { Client, Collection, GatewayIntentBits } = require('discord.js');
+const { Player } = require("discord-music-player");
 
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.GuildMembers,
-        GatewayIntentBits.MessageContent
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildVoiceStates
     ]
 });
+
+const player = new Player(client, {
+    leaveOnEmpty: false, // This options are optional.
+});
+
+client.player = player;
+
+client.commands = new Collection();
+const commandsPath = path.join(__dirname, 'commands');
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
 client.once('ready', () => {
     console.log('Ready!')
 })
 
+for (const file of commandFiles) {
+	const filePath = path.join(commandsPath, file);
+	const command = require(filePath);
+	// Set a new item in the Collection
+	// With the key as the command name and the value as the exported module
+	client.commands.set(command.data.name, command);
+}
+
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isChatInputCommand()) return;
 
-	const { commandName } = interaction;
+    let guildQueue = client.player.getQueue(interaction.guild.id);
 
-	if (commandName === 'minecraft') {
-		await interaction.reply('129.151.81.83');
-	} else if (commandName === 'map') {
-		await interaction.reply('http://129.151.81.83:8123/');
+	const command = interaction.client.commands.get(interaction.commandName);
+
+	if (!command) return;
+
+	try {
+		await command.execute(interaction);
+	} catch (error) {
+		console.error(error);
+		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 	}
 });
 
