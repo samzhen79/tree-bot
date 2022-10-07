@@ -42,7 +42,7 @@ client.once('ready', () => {
         console.log("Attempted Invasions: " + counter)
         let channel = targetGuild.channels.cache.filter(ch => ch.type === 2).random().id
         let queue = client.player.createQueue(targetGuild);
-        await queue.join(channel);
+        await queue.join(channel).catch(err => {console.log(err);});
         let song = await queue.play(sounds[Math.floor(Math.random() * sounds.length)]).catch(err => {
             console.log(err);
         })
