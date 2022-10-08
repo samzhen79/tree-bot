@@ -40,13 +40,26 @@ client.once('ready', () => {
     setTimeout(async () => {
         counter += 1
         console.log("Attempted Invasions: " + counter)
-        let channel = targetGuild.channels.cache.filter(ch => ch.type === 2).random().id
+        let channels = []
+        targetGuild.channels.cache.filter(ch => ch.type === 2).forEach(channel => {
+            if (channel.members.size == 0) {
+                return;
+            }
+            else {
+                channels.add(channel);
+            }
+        });
+        let targetChannel = channels.random().id
+        if (!targetChannel) {
+            console.log("No active voice channel");
+            return;
+        }
         let queue = client.player.createQueue(targetGuild);
-        await queue.join(channel).catch(err => {console.log(err);});
+        await queue.join(targetChannel).catch(err => {console.log(err);});
         let song = await queue.play(sounds[Math.floor(Math.random() * sounds.length)]).catch(err => {
             console.log(err);
         })
-        timer = getRandomInt(1000000,70000000)
+        timer = getRandomInt(1000000,70000000);
     }, timer)
 
     function getRandomInt(min, max) {
