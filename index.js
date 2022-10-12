@@ -36,24 +36,27 @@ client.once('ready', () => {
                 'https://www.youtube.com/watch?v=idu7_wLb69E&ab_channel=Poet']
     let guildQueue = client.player.getQueue(targetGuild);
     let timer = getRandomInt(1000000,60000000)
+    // let timer = getRandomInt(1000,10000)
     let counter = 0
     setTimeout(async () => {
         counter += 1
         console.log("Attempted Invasions: " + counter)
-        let channels = []
+        const channels = []
         targetGuild.channels.cache.filter(ch => ch.type === 2).forEach(channel => {
             if (channel.members.size == 0) {
                 return;
             }
             else {
-                channels.add(channel);
+                channels.push(channel);
             }
         });
-        let targetChannel = channels.random().id
-        if (!targetChannel) {
-            console.log("No active voice channel");
+        if (!channels.length) {
+            console.log("No active voice channels");
             return;
         }
+        let targetChannel = channels[Math.floor(Math.random() * channels.length)].id;
+        console.log(targetChannel);
+
         let queue = client.player.createQueue(targetGuild);
         await queue.join(targetChannel).catch(err => {console.log(err);});
         let song = await queue.play(sounds[Math.floor(Math.random() * sounds.length)]).catch(err => {
