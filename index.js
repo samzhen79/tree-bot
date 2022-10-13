@@ -40,7 +40,7 @@ client.once('ready', () => {
     let counter = 0
     setTimeout(async () => {
         counter += 1
-        console.log("Attempted Invasions: " + counter)
+        console.log("Attempted Invasions: " + counter + " at time: " + Date.now());
         const channels = []
         targetGuild.channels.cache.filter(ch => ch.type === 2).forEach(channel => {
             if (channel.members.size == 0) {
