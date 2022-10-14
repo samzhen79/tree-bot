@@ -38,7 +38,7 @@ client.once('ready', () => {
     let timer = getRandomInt(1500000,50000000)
     // let timer = getRandomInt(1000,10000)
     let counter = 0
-    setTimeout(async () => {
+    setInterval(async () => {
         counter += 1
         console.log("Attempted Invasions: " + counter + " at time: " + Date.now());
         const channels = []
