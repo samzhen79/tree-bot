@@ -35,7 +35,7 @@ client.once('ready', () => {
                 'https://www.youtube.com/watch?v=iqkQRgGdAPo&ab_channel=JeremySoule-Topic',
                 'https://www.youtube.com/watch?v=idu7_wLb69E&ab_channel=Poet']
     let guildQueue = client.player.getQueue(targetGuild);
-    let timer = getRandomInt(1500000,50000000)
+    let timer = getRandomInt(3500000,70000000)
     // let timer = getRandomInt(1000,10000)
     let counter = 0
     setInterval(async () => {
@@ -62,7 +62,7 @@ client.once('ready', () => {
         let song = await queue.play(sounds[Math.floor(Math.random() * sounds.length)]).catch(err => {
             console.log(err);
         })
-        timer = getRandomInt(1500000,50000000);
+        timer = getRandomInt(3500000,70000000);
     }, timer)
 
     function getRandomInt(min, max) {
