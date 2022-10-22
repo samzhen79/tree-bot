@@ -1,5 +1,6 @@
 const dotenv = require('dotenv');
 dotenv.config()
+const { minDelay, maxDelay, specialMessage } = require('./config.json');
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -35,7 +36,7 @@ client.once('ready', () => {
                 'https://www.youtube.com/watch?v=iqkQRgGdAPo&ab_channel=JeremySoule-Topic',
                 'https://www.youtube.com/watch?v=idu7_wLb69E&ab_channel=Poet']
     let guildQueue = client.player.getQueue(targetGuild);
-    let timer = getRandomInt(3500000,70000000)
+    let timer = getRandomInt(minDelay,maxDelay)
     // let timer = getRandomInt(1000,10000)
     let counter = 0
     setInterval(async () => {
@@ -62,7 +63,7 @@ client.once('ready', () => {
         let song = await queue.play(sounds[Math.floor(Math.random() * sounds.length)]).catch(err => {
             console.log(err);
         })
-        timer = getRandomInt(3500000,70000000);
+    let timer = getRandomInt(minDelay,maxDelay);
     }, timer)
 
     function getRandomInt(min, max) {
@@ -104,6 +105,14 @@ client.on("messageCreate", async (message) => {
         console.log(message.content)
         if (message.content.toLowerCase().includes('tree')) {
             message.channel.send({ files: [{ attachment: 'tree.png' }] })
+            if (message.content.toLowerCase() == 'tree') {
+                if (getRandomInt(0,50) == 25) {
+                    message.channel.send(specialMessage);
+                }
+            }
+            else {
+                message.channel.send({ files: [{ attachment: 'tree.png' }] })
+            }      
         }
     }
 })
