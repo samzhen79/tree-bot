@@ -18,6 +18,12 @@ const client = new Client({
     ]
 });
 
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+  }
+
 const player = new Player(client, {
     leaveOnEmpty: false, // This options are optional.
 });
@@ -63,14 +69,8 @@ client.once('ready', () => {
         let song = await queue.play(sounds[Math.floor(Math.random() * sounds.length)]).catch(err => {
             console.log(err);
         })
-    let timer = getRandomInt(minDelay,maxDelay);
+        let timer = getRandomInt(minDelay,maxDelay);
     }, timer)
-
-    function getRandomInt(min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
-      }
 })
 
 for (const file of commandFiles) {
