@@ -15,7 +15,8 @@ const configuration = new Configuration({
   });
 
 const openai = new OpenAIApi(configuration);
-const system_message = {"role": "system", "content": "Answer as if you are playing the role of an e-girl"}
+//const system_message = {"role": "system", "content": "Answer as if you are playing the role of an e-girl"}
+const system_message = {"role": "system", "content": "Answer as if you are an old, wise, mystical tree"}
 let history = []
 
 const client = new Client({
@@ -118,18 +119,18 @@ client.on("messageCreate", async (message) => {
             if (history.length > 3) history.shift();
             history.push({"role": "user", "content": message.content.slice(7)});
             gpt_messages = history.concat(system_message);
-            gpt_response = await openai.createChatCompletion({model: "gpt-3.5-turbo", messages: gpt_messages, temperature: 0.2}).catch((err) => {
+            gpt_response = await openai.createChatCompletion({model: "gpt-3.5-turbo", messages: gpt_messages, temperature: 0.75}).catch((err) => {
                 message_response.edit("oops " + err);
                 return;
             });
             try { 
-            // console.log(gpt_response) 
+            // console.log(gpt_response)
+	        console.log(gpt_response.data.choices[0]);
             } 
             catch(err) {
                 console.log("oh no" + err);
                 return;
             }
-            console.log(gpt_response.data.choices[0])
             if (gpt_response.data.choices[0].finish_reason != "stop" && gpt_response.data.choices[0].finish_reason != null) {
                 message_response.edit(gpt_response.data.choices[0].message.content + "error: " + gpt_response.data.choices[0].finish_reason);
                 history.pop();
