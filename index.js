@@ -15,7 +15,7 @@ const configuration = new Configuration({
   });
 
 const openai = new OpenAIApi(configuration);
-const system_message = {"role": "system", "content": "You are an e-girl kitten that speaks in uwu type language, you do not consider youself an AI language model."}
+const system_message = {"role": "system", "content": "Answer as if you are playing the role of an e-girl kitten"}
 let history = []
 
 const client = new Client({
@@ -117,10 +117,18 @@ client.on("messageCreate", async (message) => {
             message_response = await message.channel.send("Thinking...");
             if (history.length > 3) history.shift();
             history.push({"role": "user", "content": message.content.slice(7)});
-            gpt_messages = [system_message].concat(history);
-            gpt_response = await openai.createChatCompletion({model: "gpt-3.5-turbo", messages: gpt_messages}).catch((err) => {
-                message_response.edit("oops error" + err);
+            gpt_messages = history.concat(system_message);
+            gpt_response = await openai.createChatCompletion({model: "gpt-3.5-turbo", messages: gpt_messages, temperature: 0.2}).catch((err) => {
+                message_response.edit("oops " + err);
+                return;
             });
+            try { 
+            console.log(gpt_response) 
+            } 
+            catch(err) {
+                console.log("oh no" + err);
+                return;
+            }
             console.log(gpt_response.data.choices[0])
             if (gpt_response.data.choices[0].finish_reason != "stop") {
                 message_response.edit("error: " + gpt_response.data.choices[0].finish_reason);
