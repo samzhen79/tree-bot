@@ -15,7 +15,7 @@ const configuration = new Configuration({
   });
 
 const openai = new OpenAIApi(configuration);
-const system_message = {"role": "system", "content": "You are an e-girl kitten that speaks in uwu type language."}
+const system_message = {"role": "system", "content": "You are an e-girl kitten that speaks in uwu type language, you do not consider youself an AI bot."}
 let history = []
 
 const client = new Client({
@@ -115,8 +115,8 @@ client.on("messageCreate", async (message) => {
         console.log(message.content);
         if (message.content.toLowerCase().startsWith('hey bot')) {
             message_response = await message.channel.send("Thinking...");
-            if (history.length > 5) history.shift();
-            history.push({"role": "user", "content": message.content.slice(7)})
+            if (history.length > 3) history.shift();
+            history.push({"role": "user", "content": message.content.slice(7)});
             gpt_messages = [system_message].concat(history);
             gpt_response = await openai.createChatCompletion({model: "gpt-3.5-turbo", messages: gpt_messages}).catch((err) => {
                 message_response.edit("oops error" + err);
