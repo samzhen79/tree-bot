@@ -15,9 +15,10 @@ const configuration = new Configuration({
   });
 
 const openai = new OpenAIApi(configuration);
-//const system_message = {"role": "system", "content": "Answer as if you are playing the role of an e-girl"}
-const system_message = {"role": "system", "content": "Answer as if you are an old, wise, mystical tree"}
-let history = []
+const kitten_system = {"role": "system", "content": "Answer as if you are playing the role of an e-girl kitten"}
+const tree_system = {"role": "system", "content": "Answer as if you are an old, wise, mystical tree"}
+let history_kitten = []
+let history_tree = []
 
 const client = new Client({
     intents: [
@@ -99,9 +100,15 @@ client.on('interactionCreate', async interaction => {
 
 	const command = interaction.client.commands.get(interaction.commandName);
 	if (!command) return;
-    if (command.data.name == "clearhistory") history = [];
+    if (command.data.name == "clearhistory") {
+        if (interaction.options.getString("category") == "tree") history_tree = [];
+        if (interaction.options.getString("category") == "kitten") history_kitten = [];
+    }
 	try {
-        if (command.data.name == "history") await command.execute(interaction, history);
+        if (command.data.name == "history") {
+            if (interaction.options.getString("category") == "tree") await command.execute(interaction, history_tree);
+            if (interaction.options.getString("category") == "kitten") await command.execute(interaction, history_kitten);
+        }
         else await command.execute(interaction);
 	} catch (error) {
 		console.error(error);
@@ -114,43 +121,57 @@ client.on("messageCreate", async (message) => {
 
     if (!message?.author.bot) {
         console.log(message.content);
-        if (message.content.toLowerCase().startsWith('hey bot')) {
-            message_response = await message.channel.send("Thinking...");
-            if (history.length > 3) history.shift();
-            history.push({"role": "user", "content": message.content.slice(7)});
-            gpt_messages = history.concat(system_message);
-            gpt_response = await openai.createChatCompletion({model: "gpt-3.5-turbo", messages: gpt_messages, temperature: 0.75}).catch((err) => {
-                message_response.edit("oops " + err);
-                return;
-            });
-            try { 
-            // console.log(gpt_response)
-	        console.log(gpt_response.data.choices[0]);
-            } 
-            catch(err) {
-                console.log("oh no" + err);
-                return;
+        let string = message.content;
+        if (string.toLowerCase().startsWith('hey ')) {
+            string = string.slice(4);
+            if (string.toLowerCase().startsWith("tree")) {
+                string = string.slice(4);
+                promptChat(history_tree, tree_system, string, message);
             }
-            if (gpt_response.data.choices[0].finish_reason != "stop" && gpt_response.data.choices[0].finish_reason != null) {
-                message_response.edit(gpt_response.data.choices[0].message.content + "error: " + gpt_response.data.choices[0].finish_reason);
-                history.pop();
-            }
-            else {
-                message_response.edit(gpt_response.data.choices[0].message.content);
-                if (history.length > 3) history.shift();
-                history.push(gpt_response.data.choices[0].message);
+            if (string.toLowerCase().startsWith("kitten")) {
+                string = string.slice(6);
+                promptChat(history_kitten, kitten_system, string, message);
             }
         }
         if (message.content.toLowerCase().includes('tree')) {
-            message.channel.send({ files: [{ attachment: 'tree.png' }] })
             if (message.content.toLowerCase() == 'tree') {
                 if (getRandomInt(0,50) == 25) {
                     message.channel.send(specialMessage);
+                    message.channel.send({ files: [{ attachment: 'tree.png' }] })
                 }  
             }
  
         }
     }
 })
+
+async function promptChat(history, system, string, message) {
+    message_response = await message.channel.send("Thinking...");
+    if (history.length > 5) history.shift();
+    string = message.author.username + ": " + string;
+    history.push({"role": "user", "content": string});
+    gpt_messages = history.concat(system);
+    gpt_response = await openai.createChatCompletion({model: "gpt-3.5-turbo", messages: gpt_messages, temperature: 0.8}).catch((err) => {
+        message_response.edit("oops " + err);
+        return;
+    });
+    try { 
+    // console.log(gpt_response)
+        console.log(gpt_response.data.choices[0]);
+    } 
+    catch(err) {
+        console.log("oh no" + err);
+        return;
+    }
+    if (gpt_response.data.choices[0].finish_reason != "stop" && gpt_response.data.choices[0].finish_reason != null) {
+        message_response.edit(gpt_response.data.choices[0].message.content + "error: " + gpt_response.data.choices[0].finish_reason);
+        history.pop();
+    }
+    else {
+        message_response.edit(gpt_response.data.choices[0].message.content);
+        if (history.length > 5) history.shift();
+        history.push(gpt_response.data.choices[0].message);
+    }
+}
 
 client.login(process.env.DISCORD_TOKEN)
