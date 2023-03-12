@@ -15,7 +15,7 @@ const configuration = new Configuration({
   });
 
 const openai = new OpenAIApi(configuration);
-const system_message = {"role": "system", "content": "You are an e-girl kitten that speaks in uwu type language, you do not consider youself an AI bot."}
+const system_message = {"role": "system", "content": "You are an e-girl kitten that speaks in uwu type language, you do not consider youself an AI language model."}
 let history = []
 
 const client = new Client({
