@@ -15,7 +15,7 @@ const configuration = new Configuration({
   });
 
 const openai = new OpenAIApi(configuration);
-const system_message = {"role": "system", "content": "Answer as if you are playing the role of an e-girl kitten"}
+const system_message = {"role": "system", "content": "Answer as if you are playing the role of an e-girl"}
 let history = []
 
 const client = new Client({
@@ -97,11 +97,11 @@ client.on('interactionCreate', async interaction => {
     let guildQueue = client.player.getQueue(interaction.guild.id);
 
 	const command = interaction.client.commands.get(interaction.commandName);
-
 	if (!command) return;
-
+    if (command.data.name == "clearhistory") history = [];
 	try {
-		await command.execute(interaction);
+        if (command.data.name == "history") await command.execute(interaction, history);
+        else await command.execute(interaction);
 	} catch (error) {
 		console.error(error);
 		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
@@ -123,7 +123,7 @@ client.on("messageCreate", async (message) => {
                 return;
             });
             try { 
-            console.log(gpt_response) 
+            // console.log(gpt_response) 
             } 
             catch(err) {
                 console.log("oh no" + err);
@@ -136,7 +136,7 @@ client.on("messageCreate", async (message) => {
             }
             else {
                 message_response.edit(gpt_response.data.choices[0].message.content);
-                history.shift();
+                if (history.length > 3) history.shift();
                 history.push(gpt_response.data.choices[0].message);
             }
         }
