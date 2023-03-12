@@ -130,7 +130,7 @@ client.on("messageCreate", async (message) => {
                 return;
             }
             console.log(gpt_response.data.choices[0])
-            if (gpt_response.data.choices[0].finish_reason != "stop" || gpt_response.data.choices[0].finish_reason != null) {
+            if (gpt_response.data.choices[0].finish_reason != "stop" && gpt_response.data.choices[0].finish_reason != null) {
                 message_response.edit(gpt_response.data.choices[0].message.content + "error: " + gpt_response.data.choices[0].finish_reason);
                 history.pop();
             }
