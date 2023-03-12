@@ -8,6 +8,16 @@ const path = require('node:path');
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const { Player } = require("discord-music-player");
 
+const { Configuration, OpenAIApi } = require("openai");
+
+const configuration = new Configuration({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+
+const openai = new OpenAIApi(configuration);
+const system_message = {"role": "system", "content": "You are an e-girl kitten that speaks in uwu type language."}
+let history = []
+
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -102,17 +112,34 @@ client.on("messageCreate", async (message) => {
     // console.log(message)
 
     if (!message?.author.bot) {
-        console.log(message.content)
+        console.log(message.content);
+        if (message.content.toLowerCase().startsWith('hey bot')) {
+            message_response = await message.channel.send("Thinking...");
+            if (history.length > 5) history.shift();
+            history.push({"role": "user", "content": message.content.slice(7)})
+            gpt_messages = [system_message].concat(history);
+            gpt_response = await openai.createChatCompletion({model: "gpt-3.5-turbo", messages: gpt_messages}).catch((err) => {
+                message_response.edit("oops error" + err);
+            });
+            console.log(gpt_response.data.choices[0])
+            if (gpt_response.data.choices[0].finish_reason != "stop") {
+                message_response.edit("error: " + gpt_response.data.choices[0].finish_reason);
+                history.pop();
+            }
+            else {
+                message_response.edit(gpt_response.data.choices[0].message.content);
+                history.shift();
+                history.push(gpt_response.data.choices[0].message);
+            }
+        }
         if (message.content.toLowerCase().includes('tree')) {
             message.channel.send({ files: [{ attachment: 'tree.png' }] })
             if (message.content.toLowerCase() == 'tree') {
                 if (getRandomInt(0,50) == 25) {
                     message.channel.send(specialMessage);
-                }
+                }  
             }
-            else {
-                message.channel.send({ files: [{ attachment: 'tree.png' }] })
-            }      
+ 
         }
     }
 })
