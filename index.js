@@ -161,6 +161,7 @@ async function promptChat(history, system, string, message) {
     } 
     catch(err) {
         console.log("oh no" + err);
+        history.pop();
         return;
     }
     if (gpt_response.data.choices[0].finish_reason != "stop" && gpt_response.data.choices[0].finish_reason != null) {
