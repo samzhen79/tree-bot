@@ -170,12 +170,15 @@ async function promptChat(history, system, string, message) {
         history.pop();
         return;
     }
+    response = gpt_response.data.choices[0].message.content;
+    if (response.length > 3999) response = response.substring(0, 3900);
     if (gpt_response.data.choices[0].finish_reason != "stop" && gpt_response.data.choices[0].finish_reason != null) {
-        message_response.edit(gpt_response.data.choices[0].message.content + "error: " + gpt_response.data.choices[0].finish_reason);
+        response = response + "error: " + gpt_response.data.choices[0].finish_reason;
+        message_response.edit(response);
         history.pop();
     }
     else {
-        message_response.edit(gpt_response.data.choices[0].message.content);
+        message_response.edit(response);
         if (history.length > 5) history.shift();
         history.push(gpt_response.data.choices[0].message);
     }
