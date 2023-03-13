@@ -15,10 +15,12 @@ const configuration = new Configuration({
   });
 
 const openai = new OpenAIApi(configuration);
-const kitten_system = {"role": "system", "content": "Answer as if you are playing the role of an e-girl kitten"}
-const tree_system = {"role": "system", "content": "Answer as if you are an old, wise, mystical tree"}
-let history_kitten = []
-let history_tree = []
+const bot_system = {"role": "system", "content": "Answer as you normally would"};
+const kitten_system = {"role": "system", "content": "Answer as if you are playing the role of an e-girl that acts like a kitten"};
+const tree_system = {"role": "system", "content": "Answer as if you are an old, wise, mystical tree"};
+let history_bot = [];
+let history_kitten = [];
+let history_tree = [];
 
 const client = new Client({
     intents: [
@@ -96,16 +98,16 @@ for (const file of commandFiles) {
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isChatInputCommand()) return;
 
-    let guildQueue = client.player.getQueue(interaction.guild.id);
-
 	const command = interaction.client.commands.get(interaction.commandName);
 	if (!command) return;
     if (command.data.name == "clearhistory") {
+        if (interaction.options.getString("category") == "bot") history_bot = [];
         if (interaction.options.getString("category") == "tree") history_tree = [];
         if (interaction.options.getString("category") == "kitten") history_kitten = [];
     }
 	try {
         if (command.data.name == "history") {
+            if (interaction.options.getString("category") == "bot") await command.execute(interaction, history_bot);
             if (interaction.options.getString("category") == "tree") await command.execute(interaction, history_tree);
             if (interaction.options.getString("category") == "kitten") await command.execute(interaction, history_kitten);
         }
@@ -124,6 +126,10 @@ client.on("messageCreate", async (message) => {
         let string = message.content;
         if (string.toLowerCase().startsWith('hey ')) {
             string = string.slice(4);
+            if (string.toLowerCase().startsWith("bot")) {
+                string = string.slice(3);
+                promptChat(history_bot, bot_system, string, message);
+            }
             if (string.toLowerCase().startsWith("tree")) {
                 string = string.slice(4);
                 promptChat(history_tree, tree_system, string, message);
