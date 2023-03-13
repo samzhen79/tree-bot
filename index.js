@@ -171,7 +171,7 @@ async function promptChat(history, system, string, message) {
         return;
     }
     response = gpt_response.data.choices[0].message.content;
-    if (response.length > 3999) response = response.substring(0, 3900);
+    if (response.length > 2000) response = response.substring(0, 1900);
     if (gpt_response.data.choices[0].finish_reason != "stop" && gpt_response.data.choices[0].finish_reason != null) {
         response = response + "error: " + gpt_response.data.choices[0].finish_reason;
         message_response.edit(response);
