@@ -154,7 +154,7 @@ client.on("messageCreate", async (message) => {
 async function promptChat(history, system, string, message) {
     message_response = await message.channel.send("Thinking...");
     if (history.length > 5) history.shift();
-    string = message.author.username + ": " + string;
+    string = message.author.username + " said " + string;
     history.push({"role": "user", "content": string});
     gpt_messages = history.concat(system);
     gpt_response = await openai.createChatCompletion({model: "gpt-3.5-turbo", messages: gpt_messages, temperature: 0.8}).catch((err) => {
