@@ -5,6 +5,6 @@ module.exports = {
 		.setName('map')
 		.setDescription('Minecraft map!'),
 	async execute(interaction) {
-		await interaction.reply('http://129.151.81.83:8123/');
+		await interaction.reply('http://'+minecraftIP+':8123/');
 	},
 };
