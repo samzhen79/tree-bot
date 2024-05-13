@@ -13,11 +13,13 @@ module.exports = {
 
         let queue = interaction.client.player.createQueue(interaction.guild.id);
         await queue.join(interaction.member.voice.channel);
-        let song = await queue.play('https://www.youtube.com/watch?v=nRI9FMw0OB4').catch(err => {
-            console.log(err);
-            if(!guildQueue)
-                queue.stop();
-        })
-        await interaction.reply("Now Playing");
+        let song = await queue.play(interaction.options.getString('song')).catch(async _ => {
+            await interaction.reply('Could not play the requested song!');
+            queue.stop();
+        });
+        
+        if (song) {
+            await interaction.reply(`Now playing **${song.name}**`);
+        }
 }
 };
