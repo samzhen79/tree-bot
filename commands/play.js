@@ -13,8 +13,12 @@ module.exports = {
 
         let queue = interaction.client.player.createQueue(interaction.guild.id);
         await queue.join(interaction.member.voice.channel);
-        let song = await queue.play(interaction.options.getString('song')).catch(async _ => {
-            await interaction.reply('Could not play the requested song!');
+        const songUrl = interaction.options.getString('song');
+        console.log(`Attempting to play song: ${songUrl}`);
+
+        let song = await queue.play(songUrl).catch(async err => {
+            console.error(`Failed to play song: ${err}`);
+            await interaction.reply(`Could not play the requested song! Error: ${err.message}`);
             queue.stop();
         });
         
