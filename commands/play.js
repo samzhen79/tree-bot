@@ -27,17 +27,18 @@ module.exports = {
             console.error(`Failed to join voice channel: ${err}`);
             });
 
+        await interaction.deferReply();
+
         const songUrl = interaction.options.getString('song');
         console.log(`Attempting to play song: ${songUrl}`);
 
-        let song = await queue.play(songUrl).catch(async err => {
+        try {
+            let song = await queue.play(songUrl);
+            await interaction.followUp(`Now playing **${song.name}**`);
+        } catch (err) {
             console.error(`Failed to play song: ${err}`);
-            await interaction.reply(`Could not play the requested song! Error: ${err.message}`);
+            await interaction.followUp(`Could not play the requested song! Error: ${err.message}`);
             queue.stop();
-        });
-        
-        if (song) {
-            await interaction.reply(`Now playing **${song.name}**`);
         }
 }
 };
