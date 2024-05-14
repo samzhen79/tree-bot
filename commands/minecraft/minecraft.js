@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { minecraftIP } = require('../config.json');
+const { minecraftIP } = require('../../config.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
