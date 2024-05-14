@@ -11,8 +11,22 @@ module.exports = {
 
 	async execute(interaction) {
 
-        let queue = interaction.client.player.createQueue(interaction.guild.id);
-        await queue.join(interaction.member.voice.channel);
+        let guildQueue = interaction.client.player.hasQueue(interaction.guild.id);
+        let queue;
+
+        if (!guildQueue) {
+            queue = interaction.client.player.createQueue(interaction.guild.id);
+            queue.skipVotes = [];
+        } else {
+            queue = interaction.client.player.getQueue(interaction.guild.id);
+        }
+
+        let channel = interaction.member.voice.channel
+
+        await queue.join(channel).catch((err) => {
+            console.error(`Failed to join voice channel: ${err}`);
+            });
+
         const songUrl = interaction.options.getString('song');
         console.log(`Attempting to play song: ${songUrl}`);
 
